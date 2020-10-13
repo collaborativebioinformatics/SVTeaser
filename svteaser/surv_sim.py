@@ -208,12 +208,8 @@ def process_regions(ref_file, regions, out_dir, param_file):
             for name, ctg in vcf_reader.header.contigs.items():
                 header.append(f"##contig=<ID={name},length={ctg.length}>")
 
-        n_entries = 0
         for record in vcf_reader:
-            n_entries += 1
-            logging.debug("why?... %s", record.chrom)
             out_vcf_fh.write(str(record))
-        logging.debug("Should have %d more", n_entries)
 
 
         # Remove temporary files.
@@ -247,7 +243,6 @@ def surv_sim_main(args):
     # check the SURVIVOR is in the environment
     find_survivor()
 
-    logging.debug(f"Making outdir {args.output}")
     try:
         os.mkdir(args.output)
     except FileExistsError:

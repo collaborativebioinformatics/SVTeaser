@@ -63,7 +63,6 @@ def correct_survivor_vcf(in_vcf):
             line = re.sub(":GL:GQ:FT:RC:DR:DV:RR:RV", "", line)
             line = re.sub("LowQual", ".", line)
             temp_file.write(line)
-            n_entries += 1
     logging.debug("Corrected %d entries", n_entries)
     temp_file.close()
     return temp_file.name
@@ -86,7 +85,6 @@ def update_vcf(ref, insertions, survivor_vcf, out_vcf, pos_padding=0):
         out_vcf : Putput path for updated SURVIVOR VCF.
         pos_padding : Padding for start position in VCF.
     """
-    logging.debug("updating")
     survivor_vcf = correct_survivor_vcf(survivor_vcf)
     ref = pysam.FastaFile(ref)
     try:
