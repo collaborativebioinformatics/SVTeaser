@@ -63,6 +63,7 @@ optional arguments:
 
 Workflow:
 
+1.
 * Create a SVTeaser working directory (`output.svt`) by simulating SVs over a reference
 - `svteaser surv_sim reference.fasta workdir`
 2. _in progress_ Simulate reads over the altered reference and place them in the `output.svt` directory
