@@ -20,7 +20,7 @@ def serialize_contigs_to_fa(contigs, fa_path):
             fh.write(">{}\n".format(contig))
             fh.write("{}\n".format(seq))
 
-def generate_altered_ref(ref_file, sv_vcf, copy_unaltered_contigs):
+def generate_altered_ref(ref_file, sv_vcf, outdir, copy_unaltered_contigs):
     """
     Generate altered ref sequence and return.
     """
@@ -81,7 +81,14 @@ def generate_altered_ref(ref_file, sv_vcf, copy_unaltered_contigs):
         for contig, seq in alt_contigs.items():
             final_contigs.append((contig, seq))
 
-    return final_contigs
+    serialize_contigs_to_fa(final_contigs, os.path.join(outdir, "svteaser.altered.fa"))
+    shutil.copyfile(ref_file, os.path.join(outdir, "svteaser.ref.fa"))
+    if ".gz" in sv_vcf:
+        shutil.copyfile(sv_vcf, os.path.join(outdir, "svteaser.sim.vcf.gz"))
+    else:
+        path = shutil.copyfile(sv_vcf, os.path.join(outdir, "svteaser.sim.vcf"))
+        shutil.copyfile(sv_vcf, path)
+        vcf_compress(path)
 
 
 def known_sv_sim_main(args):
@@ -97,15 +104,10 @@ def known_sv_sim_main(args):
         logging.error(f"Output directory {args.output} already exists")
         exit(1)
 
-    final_contigs = generate_altered_ref(args.reference, args.sv_vcf, args.copy_unaltered_contigs)
-    serialize_contigs_to_fa(final_contigs, os.path.join(args.output, "svteaser.altered.fa"))
-    shutil.copyfile(args.reference, os.path.join(args.output, "svteaser.ref.fa"))
-    if ".gz" in args.sv_vcf:
-        shutil.copyfile(args.sv_vcf, os.path.join(args.output, "svteaser.sim.vcf.gz"))
-    else:
-        path = shutil.copyfile(args.sv_vcf, os.path.join(args.output, "svteaser.sim.vcf"))
-        shutil.copyfile(args.sv_vcf, path)
-        vcf_compress(path)
+    final_contigs = generate_altered_ref(args.reference,
+                                         args.sv_vcf,
+                                         args.output,
+                                         args.copy_unaltered_contigs)
 
     logging.info("Finished")
 
