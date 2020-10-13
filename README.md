@@ -10,7 +10,7 @@ SV simulation for rapid benchmarking
 
 ## Goals
 
-Make a tool that A) performs SV and read simulation to create inputs for benchmarking an SV caller B) creates an evaluation/reporting of the SV caller's performance. Users supply SVTeaser with a reference sequence file (.fasta) and, optionally, a set of SVs (.vcf).  SVTeaser outputs assorted statistical metrics across a range of read lengths and depths.  SVTeaser achieves rapid assessment by downsampling the full reference to a subset of numerous 10kb samples to which it adds SVs.
+Make a tool that (A) performs SV and read simulation to create inputs for benchmarking an SV caller (B) creates an evaluation/reporting of the SV caller's performance. Users supply SVTeaser with a reference sequence file (.fasta) and, optionally, a set of SVs (.vcf). SVTeaser outputs assorted statistical metrics across a range of read lengths and depths. SVTeaser achieves rapid assessment by downsampling the full reference to a subset of numerous 10kb samples to which it adds SVs.
 
 
 
