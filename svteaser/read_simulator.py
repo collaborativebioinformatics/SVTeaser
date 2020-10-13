@@ -7,7 +7,7 @@ from truvari import setup_logging
 from acebinf import cmd_exe
 
 
-def sim_reads_art(workdir, outdir=None, coverage=30, readlen=150, meanfrag=400, insertsd=50, instrument="HS25"):
+def sim_reads_art(workdir, coverage=30, readlen=150, meanfrag=400, insertsd=50, instrument="HS25"):
     """
     Run art_illumina read simulator
     """
@@ -21,13 +21,11 @@ def sim_reads_art(workdir, outdir=None, coverage=30, readlen=150, meanfrag=400, 
         logging.error(f"Cannot change into {workdir} directory")
         exit(1)
     alt_ref = 'svteaser.altered.fa'
-    if outdir is None:
-        out_path = "art_illumina.simReads"
-    else:
-        os.mkdir(outdir)
-        # Useful when running on same altered reference but different parameters
-        out_path = os.path.join(outdir, "art_illumina.simReads")
-    print (out_path)
+
+    outdir = "sim_reads_{}_{}_{}_{}_{}".format(coverage, readlen, meanfrag, insertsd, instrument)
+    os.mkdir(outdir)
+    # Useful when running on same altered reference but different parameters
+    out_path = os.path.join(outdir, "art_illumina.simReads")
     ret = cmd_exe((f"art_illumina -ss {instrument} -sam -na -i {alt_ref} -p "
                    f"-l {readlen} -m {meanfrag} -s {insertsd} -f {coverage} -o {out_path}"))
     if ret.ret_code != 0:
@@ -43,7 +41,6 @@ def sim_reads_main(args):
     args = parseArgs(args)
     # Run the commands
     sim_reads_art(args.workdir,
-                  outdir=args.out_dir,
                   coverage=args.coverage,
                   readlen=args.read_len,
                   meanfrag=args.mean_frag,

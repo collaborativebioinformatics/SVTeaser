@@ -19,7 +19,6 @@ insert_frag=(400 600)
 
 for cov in ${coverage[@]}; do
     for insert in ${insert_frag[@]}; do
-	outdir="sim_reads_${cov}_${insert}"
-        svteaser sim_reads --coverage $cov --mean-frag $insert --out-dir $outdir $surv_sim_dir  
+        svteaser sim_reads --coverage $cov --mean-frag $insert $surv_sim_dir  
     done
 done
