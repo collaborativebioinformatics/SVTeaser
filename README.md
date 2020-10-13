@@ -32,7 +32,7 @@ Make a tool that (A) performs SV and read simulation to create inputs for benchm
 - Build the SVTeaser pip install-able tarball
 - Download and install [SURVIVOR](https://github.com/fritzsedlazeck/SURVIVOR.git)
 - Put the `SURVIVOR` executable into your environment's PATH
-The three steps of this are handled by `bash install.sh`
+- The three steps of this are handled by `bash install.sh`
 
 - Install [vcftools](https://vcftools.github.io/index.html)
 - Ensure `vcftools` (e.g. `vcf-sort`) is in your environment's PATH
