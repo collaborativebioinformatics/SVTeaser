@@ -10,7 +10,7 @@ from random import randint
 
 from acebinf import cmd_exe
 from truvari import setup_logging
-from svteaser.vcfeditor import update_vcf
+from svteaser.vcfeditor import update_vcf, recalibrate_vcf
 from svteaser.utils import vcf_compress, add_fasta_entry
 import pandas as pd
 import pysam
@@ -218,14 +218,19 @@ def process_regions(ref_file, regions, out_dir, param_file):
 
         # Remove temporary files.
         shutil.rmtree(temp_dir)
-    
-    with open(out_vcf_path, 'w') as fout:
+
+    temp_combined_vcf = os.path.join(out_dir, "temp_combined.vcf")
+    with open(temp_combined_vcf, 'w') as fout:
         fout.write("\n".join(header) + '\n' + chr_header + '\n')
         out_vcf_fh.seek(0)
         fout.write(out_vcf_fh.read())
     out_altered_fa_fh.close()
     out_ref_fa_fh.close()
     out_vcf_fh.close()
+
+    # Re-calibrate the variant positions to be in reference coordinate frame.
+    recalibrate_vcf(ref_file, temp_combined_vcf, out_vcf_path)
+    os.remove(temp_combined_vcf)
     vcf_compress(out_vcf_path)
 
 def find_survivor():

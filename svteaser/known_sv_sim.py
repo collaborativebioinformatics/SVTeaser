@@ -150,8 +150,11 @@ def generate_altered_regions(ref_file, sv_vcf, outdir, region_size, max_sv_size,
         add_fasta_entry(new_contig_name, ref_seq, out_ref_fh)
         add_fasta_entry(new_contig_name, alt_seq, out_altered_fh)
 
-        record.chrom = new_contig_name
-        record.pos = relative_pos + 1
+        # NOTE: We don't update variant record to keep variants in original coordinate frame.
+        # Keeping for now in case needed, but should be removed.
+        #record.chrom = new_contig_name
+        #record.pos = relative_pos + 1
+
         records.append(record)
 
     out_altered_fh.close()

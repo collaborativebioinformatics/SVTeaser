@@ -15,6 +15,29 @@ from tempfile import NamedTemporaryFile
 import pysam
 import truvari
 
+def recalibrate_vcf(ref_path, orig_vcf_path, out_vcf_path):
+    """
+    Re-calibrate positions of input VCF to be relative to original reference.
+    """
+    ref_file = pysam.FastaFile(ref_path)
+    orig_vcf = pysam.VariantFile(orig_vcf_path)
+    header = orig_vcf.header
+ 
+    for chrom in ref_file.references:
+        length = ref_file.get_reference_length(chrom)
+        #chrom = chrom.replace("chr", "")
+        header.add_line(f"##contig=<ID={chrom},length={length}>")
+
+    with pysam.VariantFile(out_vcf_path, "w", header=header) as writer:
+        for rec in orig_vcf:
+            chrom = rec.chrom
+            chrom, start, end = chrom.split("_")
+            local_pos = rec.pos
+            global_pos = int(start) + local_pos
+            rec.chrom = chrom
+            rec.pos = global_pos
+            writer.write(rec)
+
 def correct_survivor_vcf(in_vcf):
     """
     Correct survivor vcf mistakes so it's parsable by pysam.VariantFile
