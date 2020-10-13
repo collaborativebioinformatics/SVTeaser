@@ -10,7 +10,7 @@ import shutil
 
 from acebinf import cmd_exe
 from truvari import setup_logging
-from svteaser.utils import vcf_compress
+from svteaser.utils import vcf_compress, add_fasta_entry
 import pysam
 
 
@@ -93,11 +93,6 @@ def generate_altered_ref(ref_file, sv_vcf, outdir, copy_unaltered_contigs):
         shutil.copyfile(sv_vcf, path)
         vcf_compress(path)
 
-
-def add_fasta_entry(name, seq, fasta_fh):
-    fasta_fh.write(">{}\n".format(name))
-    fasta_fh.write("{}\n".format(seq))
-    fasta_fh.flush()
 
 def generate_altered_regions(ref_file, sv_vcf, outdir, region_size, max_sv_size, padding=0):
     """

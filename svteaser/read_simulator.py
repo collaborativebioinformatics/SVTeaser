@@ -6,6 +6,7 @@ import argparse
 from truvari import setup_logging
 from acebinf import cmd_exe
 
+from svteaser.utils import check_gzip, check_samtools
 
 def sim_reads_art(workdir, coverage=30, readlen=150, meanfrag=400, insertsd=50, instrument="HS25"):
     """
@@ -33,6 +34,20 @@ def sim_reads_art(workdir, coverage=30, readlen=150, meanfrag=400, insertsd=50, 
         logging.error(ret.stderr)
         logging.error(ret.stdout)
         exit(ret.ret_code)
+
+    # Optionally compress fq
+    if check_gzip():
+        ret = cmd_exe((f"gzip {out_path}1.fq"))
+        if ret.ret_code != 0:
+            logging.info(f"Could not compress {out_path}1.fq")
+        ret = cmd_exe((f"gzip {out_path}2.fq"))
+        if ret.ret_code != 0:
+            logging.info(f"Could not compress {out_path}2.fq")
+    if check_samtools():
+        ret = cmd_exe((f"samtools view -S -b {out_path}.sam > {out_path}.bam"))
+        if ret.ret_code != 0:
+            logging.info(f"Could not compress {out_path}2.fq")
+        os.remove(f"{out_path}.sam")
 
 def sim_reads_main(args):
     """
