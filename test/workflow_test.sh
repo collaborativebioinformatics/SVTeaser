@@ -9,5 +9,5 @@ svteaser sim_reads ${OUTDIR}.svt
 # KNOWN SV SIM TEST
 OUTDIR="known_sv_sim_test"
 rm -rf ${OUTDIR}.svt
-svteaser known_sv_sim chrM.fa sample_known_sv_chrM.vcf ${OUTDIR} --len_sv_region 100 --max_sv_size 25 --ref_seq_padding 10 --debug
+svteaser known_sv chrM.fa sample_known_sv_chrM.vcf ${OUTDIR} --len_sv_region 100 --max_sv_size 25 --ref_seq_padding 10 --debug
 svteaser sim_reads ${OUTDIR}.svt

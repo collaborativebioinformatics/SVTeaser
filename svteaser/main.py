@@ -18,20 +18,16 @@ def version(args):
     print("svteaser v%s" % VERSION)
 
 TOOLS = {'surv_sim': surv_sim_main,
-         'sim_sv': in_progress,
-         'surv_vcf_fmt': surv_vcf_fmt_main,
+         'known_sv': known_sv_sim_main,
          'sim_reads': sim_reads_main,
-         'known_sv_sim' : known_sv_sim_main,
         }
 
 USAGE = """\
-SVTeaser v%s - SV simulation for rapid benchmarking
+SVTeaser v%s - SV read simulation for rapid benchmarking
 
     CMDs:
-        sim_sv          Simulate SVs
-        surv_sim        Simulate SVs with SURVIVOR
-        known_sv_sim    Simulate known SVs from VCF
-        surv_vcf_fmt    Correct a SURVIVOR simSV vcf
+        known_sv        Create genome regions from a VCF of known SVs
+        surv_sim        Simulate random SVs with SURVIVOR
         sim_reads       Run read simulators
 """ % VERSION
 
