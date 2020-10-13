@@ -73,3 +73,26 @@ def parse_truvari_dir(trudir):
     df["cnt"] = 1   
     perf = pd.DataFrame.from_dict(json.load(open(os.path.join(trudir, "summary.txt"))), orient='index')
     return df, perf.T
+
+def check_gzip():
+    """
+    Check for presence of gzip.
+    """
+    ret = cmd_exe((f"gzip --help"))
+    return ret.ret_code == 0
+
+def check_samtools():
+    """
+    Check for presence of samtools.
+    """
+    ret = cmd_exe((f"samtools --help"))
+    return ret.ret_code == 0
+
+def add_fasta_entry(name, seq, fasta_fh):
+    """
+    Add new sequence to fasta file handle.
+    """
+    fasta_fh.write(">{}\n".format(name))
+    fasta_fh.write("{}\n".format(seq))
+    fasta_fh.flush()
+

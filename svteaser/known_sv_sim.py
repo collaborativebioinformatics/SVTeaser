@@ -10,7 +10,7 @@ import shutil
 
 from acebinf import cmd_exe
 from truvari import setup_logging
-from svteaser.utils import vcf_compress
+from svteaser.utils import vcf_compress, add_fasta_entry
 import pysam
 
 
@@ -94,11 +94,6 @@ def generate_altered_ref(ref_file, sv_vcf, outdir, copy_unaltered_contigs):
         vcf_compress(path)
 
 
-def add_fasta_entry(name, seq, fasta_fh):
-    fasta_fh.write(">{}\n".format(name))
-    fasta_fh.write("{}\n".format(seq))
-    fasta_fh.flush()
-
 def generate_altered_regions(ref_file, sv_vcf, outdir, region_size, max_sv_size, padding=0):
     """
     Simulate variants from known SVs by spiking them into reference segments.
@@ -124,13 +119,19 @@ def generate_altered_regions(ref_file, sv_vcf, outdir, region_size, max_sv_size,
 
     records = []
 
+    last_chrom = ""
+    chrom_seq = ""
+
     for record in sv:
         chrom = record.chrom
+        if last_chrom != chrom:
+            logging.debug("Load new chrom {}".format(chrom))
+            last_chrom = chrom
+            chrom_seq = reference.fetch(chrom)
+
         pos = record.pos - 1
         ref = record.ref
         alt = record.alts[0]
-
-        chrom_seq = reference.fetch(chrom)
 
         if abs(len(alt) - len(ref)) > max_sv_size:
             logging.debug(f"Skip variations longer than {max_sv_size}")
