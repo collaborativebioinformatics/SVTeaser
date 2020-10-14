@@ -1,5 +1,5 @@
 # SVTeaser
-![] (https://github.com/collaborativebioinformatics/SVTeaser/main/SVTeaserLogo.jpg)
+(https://github.com/collaborativebioinformatics/SVTeaser/blob/main/SVTeaserLogo.jpg)
 SV simulation for rapid benchmarking
 
 [Previous Work](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0803-1)
