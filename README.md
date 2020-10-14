@@ -1,4 +1,5 @@
 # SVTeaser
+![](https://github.com/collaborativebioinformatics/SVTeaser/blob/main/SVTeaserLogo.jpg)
 
 SV simulation for rapid benchmarking
 
@@ -10,7 +11,8 @@ SV simulation for rapid benchmarking
 
 ## Goals
 
-Make a tool that performs SV and read simulation to create inputs for benchmarking an SV caller. Create an evaluation/reporting procedure of the SV callers’ performance.
+Make a tool that (A) performs SV and read simulation to create inputs for benchmarking an SV caller (B) creates an evaluation/reporting of the SV caller's performance. Users supply SVTeaser with a reference sequence file (.fasta) and, optionally, a set of SVs (.vcf). SVTeaser outputs assorted statistical metrics across a range of read lengths and depths. SVTeaser achieves rapid assessment by downsampling the full reference to a subset of numerous 10kb samples to which it adds SVs.
+
 
 
 ## Overview Diagram
@@ -31,18 +33,20 @@ Make a tool that performs SV and read simulation to create inputs for benchmarki
 - Build the SVTeaser pip install-able tarball
 - Download and install [SURVIVOR](https://github.com/fritzsedlazeck/SURVIVOR.git)
 - Put the `SURVIVOR` executable into your environment's PATH
+- The three steps of this are handled by `bash install.sh`
+
 - Install [vcftools](https://vcftools.github.io/index.html)
 - Ensure `vcftools` (e.g. `vcf-sort`) is in your environment's PATH
 - Put [ART read simulator](https://www.niehs.nih.gov/research/resources/software/biostatistics/art/index.cfm) executable into your environment's PATH
+- Install [truvari](https://github.com/spiralgenetics/truvari)
 
-The three steps of this are handled by `bash install.sh`
 
 ## Quick Start
 
 ```
 usage: svteaser [-h] CMD ...
 
-SVTeaser v0.1 - SV simulation for rapid benchmarking
+SVTeaser v0.0.1 - SV simulation for rapid benchmarking
 
     CMDs:
         sim_sv          Simulate SVs
@@ -60,6 +64,7 @@ optional arguments:
 
 Workflow:
 
+1.
 * Create a SVTeaser working directory (`output.svt`) by simulating SVs over a reference
 - `svteaser surv_sim reference.fasta workdir`
 2. _in progress_ Simulate reads over the altered reference and place them in the `output.svt` directory
