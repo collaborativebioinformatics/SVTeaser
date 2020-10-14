@@ -7,7 +7,7 @@ from svteaser.surv_sim import surv_sim_main
 from svteaser.read_simulator import sim_reads_main
 from svteaser.known_sv_sim import known_sv_sim_main
 
-VERSION="0.0.2"
+VERSION="0.1"
 
 def in_progress(args):
     """placeholder"""
