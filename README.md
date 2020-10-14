@@ -46,12 +46,11 @@ Make a tool that (A) performs SV and read simulation to create inputs for benchm
 ```
 usage: svteaser [-h] CMD ...
 
-SVTeaser v0.0.1 - SV simulation for rapid benchmarking
+SVTeaser v0.1 - SV read simulation for rapid benchmarking
 
     CMDs:
-        sim_sv          Simulate SVs
-        surv_sim        Simulate SVs with SURVIVOR
-        surv_vcf_fmt    Correct a SURVIVOR simSV vcf
+        known_sv        Create genome regions from a VCF of known SVs
+        surv_sim        Simulate random SVs with SURVIVOR
         sim_reads       Run read simulators
 
 positional arguments:
@@ -64,10 +63,9 @@ optional arguments:
 
 Workflow:
 
-1.
-* Create a SVTeaser working directory (`output.svt`) by simulating SVs over a reference
+1. Create a SVTeaser working directory (`output.svt`) by simulating SVs over a reference
 - `svteaser surv_sim reference.fasta workdir`
-2. _in progress_ Simulate reads over the altered reference and place them in the `output.svt` directory
+2. Simulate reads over the altered reference and place them in the `output.svt` directory
 - `svteaser sim_reads workdir.svt`
 3. Call SVs over the reads (`output.svt/read1.fastq output.svt/read2.fastq`) with your favorite SV caller
 4. Run `truvari bench` with the `--base output.svt/simulated.sv.vcf.gz` and `--comp your_calls.vcf.gz`
@@ -78,13 +76,15 @@ See `test/workflow_test.sh` for an example
 ## Component Details
 
 ### SV Simulator
-Two methods for SV simulation are supported in `SVTeaser` - (_done_) simulation of SV with `SURVIVOR`
-and (_in progress_) simulation of SVs from VCFs.
+Two methods for SV simulation are supported in `SVTeaser` -
+
+1. simulation of SV with `SURVIVOR` using the `surv_sim` option.
+2. simulation of real SVs from user provided VCFs using the `known_sv`) option.
 
 Running simulation in either mode results in an output directory of the following structure -
 ```
 $ svteaser surv_sim reference.fasta workdir
-$ ll -h workdir
+$ ll -h workdir.svt
 total 2.3M
 drwxr-xr-x  2 user hardware 4.0K Oct 12 15:38 ./
 drwxr-xr-x 13 user hardware 4.0K Oct 12 15:38 ../
