@@ -1,4 +1,6 @@
 # SVTeaser
+![](https://github.com/collaborativebioinformatics/SVTeaser/blob/main/SVTeaserLogo.jpg)
+
 SV simulation for rapid benchmarking
 
 [Previous Work](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0803-1)
@@ -44,7 +46,7 @@ Make a tool that (A) performs SV and read simulation to create inputs for benchm
 ```
 usage: svteaser [-h] CMD ...
 
-SVTeaser v0.1 - SV simulation for rapid benchmarking
+SVTeaser v0.0.1 - SV simulation for rapid benchmarking
 
     CMDs:
         sim_sv          Simulate SVs
