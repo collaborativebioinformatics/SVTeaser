@@ -44,7 +44,7 @@ Make a tool that (A) performs SV and read simulation to create inputs for benchm
 ```
 usage: svteaser [-h] CMD ...
 
-SVTeaser v0.0.1 - SV simulation for rapid benchmarking
+SVTeaser v0.1 - SV simulation for rapid benchmarking
 
     CMDs:
         sim_sv          Simulate SVs

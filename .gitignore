@@ -5,3 +5,5 @@ build/
 dist/
 __pycache__/
 mito_test.svt/
+*.pyc
+known_sv_sim_test.svt

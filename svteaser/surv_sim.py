@@ -1,5 +1,6 @@
 import os
 import math
+import shutil
 import inspect
 import logging
 import argparse
@@ -9,8 +10,8 @@ from random import randint
 
 from acebinf import cmd_exe
 from truvari import setup_logging
-from svteaser.vcfeditor import update_vcf
-from svteaser.utils import vcf_compress
+from svteaser.vcfeditor import update_vcf, recalibrate_vcf
+from svteaser.utils import vcf_compress, add_fasta_entry
 import pandas as pd
 import pysam
 
@@ -64,6 +65,19 @@ def generate_regions_from_file(regions_file):
         region_list.append((chrm, start, end))
     return region_list
 
+def verify_requested_regions(ref, num_regions, length):
+    total_regions = 0
+    for chrom in ref.references:
+        chrom_length = ref.get_reference_length(chrom)
+        total_regions = total_regions + math.floor(chrom_length/length)
+
+    if total_regions < num_regions:
+        logging.critical("Unable to generate %d non-overlapping regions. Reference too short?", num_regions)
+        logging.critical("Generating %d non-overlapping regions", total_regions)
+        return total_regions
+    else:
+        return num_regions
+
 def generate_random_regions(ref_file, region_length, num_regions):
     def generate_region(ref, length):
         chridx = randint(0, len(ref.references)-1)
@@ -80,14 +94,27 @@ def generate_random_regions(ref_file, region_length, num_regions):
 
     region_list = []
     chrom_randidx = {}
+
+    num_regions = verify_requested_regions(ref, num_regions, region_length)
+
+    # We let the while loop run for num_tries before exiting. 
+    num_tries = 2*num_regions
+    loop_count = 0
     while len(region_list) != num_regions:
+        loop_count = loop_count + 1
         randidx, chrom, start, end = generate_region(ref, region_length) 
+
+        # If the region contains "N", then discard this turn.
+        reg_string = ref.fetch(chrom, start, end)
+        if "N" in reg_string:
+            continue
+
         if chrom in chrom_randidx:
             if randidx not in chrom_randidx[chrom]:
                 region_list.append((chrom, start, end))
                 chrom_randidx[chrom].append(randidx)
-            else:
-                logging.critical("Unable to generate %d non-overlapping regions. Reference too short?", num_regions)
+            if loop_count == num_tries:
+                logging.critical("Unable to generate %d non-overlapping regions. Tried %d times", (num_regions, num_tries))
                 logging.error("Exiting")
                 exit(1)
         else:
@@ -95,11 +122,6 @@ def generate_random_regions(ref_file, region_length, num_regions):
             chrom_randidx[chrom] = [randidx]
 
     return region_list
-
-def add_fasta_entry(name, seq, fasta_fh):
-    fasta_fh.write(">{}\n".format(name))
-    fasta_fh.write("{}\n".format(seq))
-    fasta_fh.flush()
 
 def update_altered_fa(ref_seq, altered_ref_seq, padding):
     begin_seq = ref_seq[0:padding]
@@ -111,17 +133,20 @@ def process_regions(ref_file, regions, out_dir, param_file):
     out_vcf_path = os.path.join(out_dir, "svteaser.sim.vcf")
     out_ref_fa_path = os.path.join(out_dir, "svteaser.ref.fa")
     out_altered_fa_path = os.path.join(out_dir, "svteaser.altered.fa")
+    from io import StringIO
+    out_vcf_fh = StringIO()
 
-    out_vcf_fh = None
+    header = None
     out_ref_fa_fh = open(out_ref_fa_path, "w+")
     out_altered_fa_fh = open(out_altered_fa_path, "w+")
-
+    chr_header = None
     ref = pysam.FastaFile(ref_file)
 
     # Define padding in reference region where SVs are not to be inserted.
     padding = 800
-
+    logging.debug("Processing regions")
     for i, (chrom, start, end) in enumerate(regions):
+        logging.debug("%s %d %s", chrom, start, end)
         # Track status.
         if (i + 1) % 50 == 0:
             logging.info("Processed {}/{} regions...".format(i + 1, len(regions)))
@@ -145,6 +170,7 @@ def process_regions(ref_file, regions, out_dir, param_file):
 
         # Run SURVIVOR.
         prefix = os.path.join(temp_dir, "simulated")
+        ret = cmd_exe("SURVIVOR -h")
         survivor_cmd = " ".join(["SURVIVOR",
                                  "simSV",
                                  temp_ref_fa,
@@ -152,6 +178,8 @@ def process_regions(ref_file, regions, out_dir, param_file):
                                  "0.0",
                                  "0",
                                  prefix])
+        for i in range(100):
+            ret = cmd_exe(survivor_cmd)
         ret = cmd_exe(survivor_cmd)
         # should be checking here
 
@@ -172,20 +200,33 @@ def process_regions(ref_file, regions, out_dir, param_file):
         add_fasta_entry(name, ref_seq, out_ref_fa_fh)
 
         vcf_reader = pysam.VariantFile(temp_vcf)
-        header = vcf_reader.header
-        if not out_vcf_fh:
-            out_vcf_fh = pysam.VariantFile(out_vcf_path, 'w', header=header)
+        if not header:
+            header = str(vcf_reader.header).split('\n')
+            chr_header = header[-2]
+            header = header[:-2]
+        else:
+            for name, ctg in vcf_reader.header.contigs.items():
+                header.append(f"##contig=<ID={name},length={ctg.length}>")
 
         for record in vcf_reader:
-            out_vcf_fh.write(record)
+            out_vcf_fh.write(str(record))
+
 
         # Remove temporary files.
-        import shutil
         shutil.rmtree(temp_dir)
 
+    temp_combined_vcf = os.path.join(out_dir, "temp_combined.vcf")
+    with open(temp_combined_vcf, 'w') as fout:
+        fout.write("\n".join(header) + '\n' + chr_header + '\n')
+        out_vcf_fh.seek(0)
+        fout.write(out_vcf_fh.read())
     out_altered_fa_fh.close()
     out_ref_fa_fh.close()
     out_vcf_fh.close()
+
+    # Re-calibrate the variant positions to be in reference coordinate frame.
+    recalibrate_vcf(ref_file, temp_combined_vcf, out_vcf_path)
+    os.remove(temp_combined_vcf)
     vcf_compress(out_vcf_path)
 
 def find_survivor():
@@ -202,7 +243,6 @@ def surv_sim_main(args):
     # check the SURVIVOR is in the environment
     find_survivor()
 
-    logging.debug(f"Making outdir {args.output}")
     try:
         os.mkdir(args.output)
     except FileExistsError:
