@@ -42,7 +42,7 @@ The three steps of this are handled by `bash install.sh`
 ```
 usage: svteaser [-h] CMD ...
 
-SVTeaser v0.0.1 - SV simulation for rapid benchmarking
+SVTeaser v0.1 - SV simulation for rapid benchmarking
 
     CMDs:
         sim_sv          Simulate SVs
