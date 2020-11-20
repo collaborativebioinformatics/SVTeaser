@@ -79,7 +79,61 @@ See `test/workflow_test.sh` for an example
 Two methods for SV simulation are supported in `SVTeaser` -
 
 1. simulation of SV with `SURVIVOR` using the `surv_sim` option.
-2. simulation of real SVs from user provided VCFs using the `known_sv`) option.
+```
+usage: surv_sim [-h] [--debug] [--sv_regions SV_REGIONS]
+                [--num_sv_regions NUM_SV_REGIONS]
+                [--len_sv_region LEN_SV_REGION]
+                REF OUT
+
+Run survivor simSV commands. Output them into a directory
+
+positional arguments:
+  REF                   Reference file overwhich to simulate SVs
+  OUT                   SVTeaser output basename (output)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --debug               Verbose logging
+  --sv_regions SV_REGIONS
+                        Comma separated file containing (chr, region_start,
+                        region_end). For every row, an SV of length
+                        randint(50, mx_variation) is generated with the region
+                        specified by (chr, start, end). chr, start, end chr22,
+                        1000, 20000 chr22, 50000, 80000
+  --num_sv_regions NUM_SV_REGIONS
+                        Alternatively to the csv file defined by --sv_regions,
+                        user can also provide number of regions to generate
+                        SVs for. The programme will randomly choose locations
+                        within the genome to introduce the SVs. --sv_regions
+                        will be given priority if both options are provided.
+  --len_sv_region LEN_SV_REGION
+                        The length of regions to create.
+```
+2. simulation of real SVs from user provided VCFs using the `known_sv` option.
+```
+usage: known_sv_sim [-h] [--debug] [--len_sv_region LEN_SV_REGION]
+                    [--max_sv_size MAX_SV_SIZE]
+                    [--ref_seq_padding REF_SEQ_PADDING]
+                    REF SV_VCF OUT
+
+Run simulation on reference with known SVs. Output them into a directory.
+
+positional arguments:
+  REF                   Reference file overwhich to simulate SVs
+  SV_VCF                VCF with known SVs to simulate. MUST BE SORTED.
+  OUT                   SVTeaser output basename (output)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --debug               Verbose logging
+  --len_sv_region LEN_SV_REGION
+                        The length of regions to create.
+  --max_sv_size MAX_SV_SIZE
+                        Max length of variations to spike.
+  --ref_seq_padding REF_SEQ_PADDING
+                        Padded region around each end of reg where variation
+                        are spiked.
+```
 
 Running simulation in either mode results in an output directory of the following structure -
 ```
@@ -93,4 +147,32 @@ drwxr-xr-x 13 user hardware 4.0K Oct 12 15:38 ../
 -rw-r--r--  1 user hardware 228K Oct 12 15:38 svteaser.sim.vcf    # <---- Combined VCF with variants from each region
 -rw-r--r--  1 user hardware  34K Oct 12 15:38 svteaser.sim.vcf.gz
 -rw-r--r--  1 user hardware  121 Oct 12 15:38 svteaser.sim.vcf.gz.tbi
+```
+
+### Reads Simulator
+Altered sequences are used to generate Illumina short-read using the follwing commands.
+
+```
+usage: sim_reads [-h] [--coverage COVERAGE] [--read-len READ_LEN]
+                 [--mean-frag MEAN_FRAG] [--insert-sd INSERT_SD]
+                 [--seq-inst SEQ_INST] [--keep-bam] [--out-dir OUT_DIR]
+                 DIR
+
+Run read simulators
+
+positional arguments:
+  DIR                   SVTeaser working directory
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --coverage COVERAGE   Depth of coverage to simulate (30)
+  --read-len READ_LEN   Simulated read length (150)
+  --mean-frag MEAN_FRAG
+                        Mean insert fragment length (400)
+  --insert-sd INSERT_SD
+                        Insert fragment length standard deviation (50)
+  --seq-inst SEQ_INST   Sequencing instrument (HS25)
+  --keep-bam            Keep the simulated reads' sam/bam file
+  --out-dir OUT_DIR     Output directory to save the results to. If
+                        unspecified, will save the results at DIR
 ```
