@@ -9,9 +9,9 @@ SV simulation for rapid benchmarking
 
 [Presentation](https://docs.google.com/presentation/d/1tn9Yj5cRzizwnuOwf_PMNdAk46DuFlXUyILEEZ0GG-0/edit?usp=sharing)
 
-## Goals
+## Introduction
 
-Make a tool that (A) performs SV and read simulation to create inputs for benchmarking an SV caller (B) creates an evaluation/reporting of the SV caller's performance. Users supply SVTeaser with a reference sequence file (.fasta) and, optionally, a set of SVs (.vcf). SVTeaser outputs assorted statistical metrics across a range of read lengths and depths. SVTeaser achieves rapid assessment by downsampling the full reference to a subset of numerous 10kb samples to which it adds SVs.
+SV detection callers often have a large number of false detections requiring benchmarking to assess method quality before finalizing a workflow. However, few tools are available to simulate data for SV benchmarking. SVTeaser is a tool for rapid assessment of structural variant (SV) calling fidelity with two main use-cases: 1) genotyping a set of pre-ascertained SVs and 2) benchmarking a new algorithm against pre-existing tools across a range of parameters. Users supply SVTeaser with a reference sequence file (.fasta) and, optionally, a set of SVs (.vcf). SVTeaser outputs simulated reads across a range of read lengths and depths and provides a downstream dataframe based analysis framework for evaluating accuracy. SVTeaser achieves rapid assessment by downsampling the full reference to a subset of numerous 10kb samples to which it adds SVs.
 
 
 
@@ -25,8 +25,6 @@ Make a tool that (A) performs SV and read simulation to create inputs for benchm
 
 [Here](https://docs.google.com/document/d/1AQxiYEbBhN0-HCAOsrqHZxvsh4ZIFxxeVoJGxApmG-U/edit#)
 
-# File structure diagram 
-#### _Define paths, variable names, etc_
 
 ## Installation
 
